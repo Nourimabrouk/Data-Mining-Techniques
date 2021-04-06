@@ -4,21 +4,20 @@ Data Mining Techniques
 Assignment 1 
 Task 1 A
 "
+remove(list = ls())
 options(warn=-1)
 library(here)
 library(tidyverse)
 library(lubridate)
 library(ggplot2)
-
-colnames(ODI)
-dim(ODI)
-ODI %>% head()
+library(reshape2)
+library(plyr)
 
 names = c("DateTime", "Programme", "MLCourse", "IRCourse", "StatCourse", "DBCourse", "Gender", "Chocolate",
           "Birthdate", "Neighbours", "Standup", "Stresslevel", "Reward", "RandomNo", "Bedtime", "Goodday1",
           "Goodday2")
-raw = read_csv(here('data','ODI', 'ODI-2021.csv'), col_names = names) %>% as_tibble() %>% slice(-1)
-
+#raw = read_csv(here('data','ODI', 'ODI-2021.csv'), col_names = names) %>% as_tibble() %>% slice(-1)
+raw = read_csv("/Users/vyly/Desktop/VU_Master/DataMining/Data-Mining-Techniques/data/ODI/ODI-2021.csv", col_names = names) %>% as_tibble() %>% slice(-1)
 ODI = raw %>% 
   separate(DateTime, sep = " ", into = c("Date", "Time")) %>% 
   mutate(MLCourse = as.integer(MLCourse == "yes"),
@@ -31,6 +30,10 @@ ODI = raw %>%
          Stresslevel = as.integer(ifelse(str_detect(Stresslevel, regex('over', ignore_case = T)), NA, Stresslevel)) # Remove non numerical 
          ) %>% 
   select(-c('Standup')) # Drop standup
+
+colnames(ODI)
+dim(ODI)
+ODI %>% head()
 
 ODI[,'Neighbours'][ODI[,'Neighbours'] > 10] = NA # Replace higher than 10 (unreasonable values) by NA
 ODI[,'Stresslevel'][ODI[,'Stresslevel'] < 0 | ODI[,'Stresslevel'] > 100] = NA # Remove outside range (0,100)
@@ -49,8 +52,26 @@ ODI <- ODI %>%
     Programme = Programme_cluster,
     Date = mdy(Date),
     Time = hms(Time))
+#unique(ODI$Programme)
 
-ODI
+#####Plotting#####
+##Stacked plot's data
+df = ODI[,3:7]
+colnames(df) <- c("Programme","ML", "IR","St","DB")
+#Wide to long for plotting
+meltd <- melt(df, id.vars ="Programme",na.rm = T)
+#Order the column's value for stacked plot
+d <- with(meltd, meltd[order(Programme, variable, value),])
+#standardise binary value
+d$value = factor(d$value, levels = c("1","0","mu","sigma","ja","nee"), labels = c(1,0,1,0,1,0))
+#create a column with value of 1 for the y axis
+d$count = rep(1)
+#plot
+ggplot(data=d, aes(x=variable, y=count, fill=value)) + 
+  geom_bar(stat="identity") + 
+  facet_grid(~Programme) +
+  labs(title="Student Academic Background Info", x="Course", y="Count", fill="Participation") + 
+  theme(plot.title = element_text(size=25, margin=margin(t=20, b=20)))
 
 TODO:
 
