@@ -44,7 +44,11 @@ Programme_cluster =
     ifelse(grepl("BA|Business", ODI$Programme, ignore.case=T), "BIZ",
     "Other"))))))
 
-ODI <- ODI %>% mutate(Programme = Programme_cluster)
+ODI <- ODI %>% 
+  mutate(
+    Programme = Programme_cluster,
+    Date = mdy(Date),
+    Time = hms(Time))
 
 ODI
 
