@@ -73,6 +73,7 @@ ggplot(data=d, aes(x=variable, y=count, fill=value)) +
   labs(title="Student Academic Background Info", x="Course", y="Count", fill="Participation") + 
   theme(plot.title = element_text(size=25, margin=margin(t=20, b=20)))
 
+sum(d$Programme =="ECO")
 TODO:
 
 # Programme  
@@ -88,3 +89,4 @@ TODO:
 # Bedtime
   # Assign groups
 # Gday1/2
+
