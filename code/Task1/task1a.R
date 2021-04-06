@@ -42,8 +42,13 @@ Programme_cluster =
     ifelse(grepl("AI|artificial", ODI$Programme, ignore.case=T), "AI",
     ifelse(grepl("CS|Computer|Computational", ODI$Programme, ignore.case=T), "CS",
     ifelse(grepl("Bio", ODI$Programme, ignore.case=T), "BIO",
+<<<<<<< Updated upstream
     ifelse(grepl("Finance|Duisenberg|QRM", ODI$Programme, ignore.case=T), "FIN",
     ifelse( grepl("Econometrics|EDS|EOR", ODI$Programme, ignore.case=T), "ECO",
+=======
+    ifelse(grepl("Finance|Duisenberg", ODI$Programme, ignore.case=T), "FIN",
+    ifelse(grepl("Econometrics|EDS", ODI$Programme, ignore.case=T), "ECO",
+>>>>>>> Stashed changes
     ifelse(grepl("BA|Business", ODI$Programme, ignore.case=T), "BIZ",
     "Other"))))))
 
@@ -54,6 +59,7 @@ ODI <- ODI %>%
     Time = hms(Time))
 #unique(ODI$Programme)
 
+<<<<<<< Updated upstream
 #####Plotting#####
 ##Stacked plot's data
 df = ODI[,3:7]
@@ -75,9 +81,15 @@ ggplot(data=d, aes(x=variable, y=count, fill=value)) +
 
 sum(d$Programme =="ECO")
 TODO:
+=======
 
-# Programme  
-  # Make clusters based on regex conditions "If contains: ... "Assign group = 1:7)
+ODI %>% View()
+
+barchart_input = ODI %>% select(3:7)
+barchart_input
+>>>>>>> Stashed changes
+
+TODO:
 
 # Birthdate
   # Extract Years
