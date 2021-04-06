@@ -35,13 +35,24 @@ ODI = raw %>%
 ODI[,'Neighbours'][ODI[,'Neighbours'] > 10] = NA # Replace higher than 10 (unreasonable values) by NA
 ODI[,'Stresslevel'][ODI[,'Stresslevel'] < 0 | ODI[,'Stresslevel'] > 100] = NA # Remove outside range (0,100)
 
-ODI %>% select(Stresslevel) %>% View()
-ODI %>% View
+Programme_cluster =
+    ifelse(grepl("AI|artificial", ODI$Programme, ignore.case=T), "AI",
+    ifelse(grepl("CS|Computer|Computational", ODI$Programme, ignore.case=T), "CS",
+    ifelse(grepl("Bio", ODI$Programme, ignore.case=T), "BIO",
+    ifelse(grepl("Finance|Duisenberg", ODI$Programme, ignore.case=T), "FIN",
+    ifelse( grepl("Econometrics|EDS", ODI$Programme, ignore.case=T), "ECO",
+    ifelse(grepl("BA|Business", ODI$Programme, ignore.case=T), "BIZ",
+    "Other"))))))
+
+ODI <- ODI %>% mutate(Programme = Programme_cluster)
+
+ODI
 
 TODO:
 
 # Programme  
   # Make clusters based on regex conditions "If contains: ... "Assign group = 1:7)
+
 # Birthdate
   # Extract Years
 # Reward
