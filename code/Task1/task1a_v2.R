@@ -18,7 +18,7 @@ names = c("DateTime", "Programme", "MLCourse", "IRCourse", "StatCourse", "DBCour
           "Birthdate", "Neighbours", "Standup", "Stresslevel", "Reward", "RandomNo", "Bedtime", "Goodday1",
           "Goodday2")
 #raw = read_csv(here('data','ODI', 'ODI-2021.csv'), col_names = names) %>% as_tibble() %>% slice(-1)
-raw = read_csv("/Users/Lucas/Documents/Studie/VU/MSc/Data_Mining_Techniques/Data-Mining-Techniques/data/ODI/ODI-2021.csv", col_names = names) %>% as_tibble() %>% slice(-1)
+raw = read_csv("~/Studie/VU/MSc/Data_Mining_Techniques/Data-Mining-Techniques/data/ODI/ODI-2021.csv", col_names = names) %>% as_tibble() %>% slice(-1)
 ODI = raw %>% 
   separate(DateTime, sep = " ", into = c("Date", "Time")) %>% 
   mutate(MLCourse = as.integer(MLCourse == "yes"),
