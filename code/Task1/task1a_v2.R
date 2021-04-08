@@ -39,13 +39,22 @@ ODI %>% head()
 ODI[,'Neighbours'][ODI[,'Neighbours'] > 10] = NA # Replace higher than 10 (unreasonable values) by NA
 ODI[,'Stresslevel'][ODI[,'Stresslevel'] < 0 | ODI[,'Stresslevel'] > 100] = NA # Remove outside range (0,100)
 
+ODI$Programme
+str_detect(ODI$Programme,regex("AI|artificial", ignore_case = TRUE))
+
+Programme_cluster = 
+  str_replace()
+
+
+
+
 Programme_cluster =
-    ifelse(str_detect(c("AI","artificial"), ODI$Programme), "AI",
-    ifelse(str_detect(c("CS","Computer","Computational"), ODI$Programme), "CS",
-    ifelse(str_detect("Bio", ODI$Programme), "BIO",
-    ifelse(str_detect(c("Finance","Duisenberg","QRM","Risk"), ODI$Programme), "FIN",
-    ifelse(str_detect(c("Econometrics","EDS","EOR"), ODI$Programme), "ECO",
-    ifelse(str_detect(c("BA","Business"), ODI$Programme), "BIZ",
+    ifelse(str_detect(ODI$Programme,regex("AI|artificial", ignore_case = TRUE)), "AI",
+    ifelse(str_detect(ODI$Programme,regex("CS|Computer|Computational", ignore_case = TRUE)), "CS",
+    ifelse(str_detect(ODI$Programme,regex("Bio", ignore_case = TRUE)), "BIO",
+    ifelse(str_detect(ODI$Programme,regex("Finance|Duisenberg|QRM|Risk", ignore_case = TRUE)), "FIN",
+    ifelse(str_detect(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE)), "ECO",
+    ifelse(str_detect(ODI$Programme,regex("BA|Business", ignore_case = TRUE)), "BUS",
     "Other"))))))
 
 # Programme_cluster =
