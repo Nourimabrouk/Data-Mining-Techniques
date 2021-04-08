@@ -42,10 +42,16 @@ ODI[,'Stresslevel'][ODI[,'Stresslevel'] < 0 | ODI[,'Stresslevel'] > 100] = NA # 
 ODI$Programme
 str_detect(ODI$Programme,regex("AI|artificial", ignore_case = TRUE))
 
-Programme_cluster = 
-  str_replace()
+Programme_cluster <- ODI$Programme %>% 
+  str_replace(regex("AI|artificial", ignore_case = TRUE), "AI") %>% 
+  str_replace(regex("CS|Computer|Computational", ignore_case = TRUE), "CS") %>%
+  str_replace(regex("Bio", ignore_case = TRUE), "BIO") %>% 
+  str_replace(regex("Finance|Duisenberg|QRM|Risk", ignore_case = TRUE), "FIN") %>% 
+  str_replace(regex("Econometrics|EDS|EOR", ignore_case = TRUE), "ECO") %>% 
+  str_replace(regex("BA|Business", ignore_case = TRUE), "BUS")
+  
 
-
+Programme_cluster
 
 
 Programme_cluster =
