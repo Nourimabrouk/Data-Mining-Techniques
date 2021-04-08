@@ -39,21 +39,63 @@ ODI %>% head()
 ODI[,'Neighbours'][ODI[,'Neighbours'] > 10] = NA # Replace higher than 10 (unreasonable values) by NA
 ODI[,'Stresslevel'][ODI[,'Stresslevel'] < 0 | ODI[,'Stresslevel'] > 100] = NA # Remove outside range (0,100)
 
-ODI$Programme
-str_detect(ODI$Programme,regex("AI|artificial", ignore_case = TRUE))
+ODI$Programme[grepl("AI|artificial", ODI$Programme, ignore.case=TRUE)] <- "AI"
+ODI$Programme[grepl("\\bCS\\b|Computer|Computational", ODI$Programme, ignore.case=TRUE)] <- "CS"
+ODI$Programme[grepl("Bio", ODI$Programme, ignore.case=TRUE)] <- "BIO"
+ODI$Programme[grepl("Finance|Duisenberg|QRM|Risk", ODI$Programme, ignore.case=TRUE)] <- "FIN"
+ODI$Programme[grepl("Econometrics|EDS|EOR", ODI$Programme, ignore.case=TRUE)] <- "ECO"
+ODI$Programme[grepl("BA|Business", ODI$Programme, ignore.case=TRUE)] <- "BUS"
 
-Programme_cluster <- ODI$Programme %>% 
-  str_replace(regex("AI|artificial", ignore_case = TRUE), "AI") %>% 
-  str_replace(regex("CS|Computer|Computational", ignore_case = TRUE), "CS") %>%
-  str_replace(regex("Bio", ignore_case = TRUE), "BIO") %>% 
-  str_replace(regex("Finance|Duisenberg|QRM|Risk", ignore_case = TRUE), "FIN") %>% 
-  str_replace(regex("Econometrics|EDS|EOR", ignore_case = TRUE), "ECO") %>% 
-  str_replace(regex("BA|Business", ignore_case = TRUE), "BUS")
+count(ODI$Programme=="ECO")
+
+
+str_count(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE))
+
+count(str_subset(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE)))
+length(str_subset(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE)))
+replace(str_subset(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE)), values = "ECO")
+
+ODI$Programme <- ODI$Programme %>% 
+  replace(str_subset(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE)), values = "ECO")
+
+
+
+
+str_replace_all(ODI$Programme,regex("AI|artificial", ignore_case = TRUE), "AI")
+  str_view(regex("CS|Computer|Computational", ignore_case = TRUE))
+  str_view(regex("Bio", ignore_case = TRUE))
+  str_view(regex("Finance|Duisenberg|QRM|Risk", ignore_case = TRUE)) 
+str_count(ODI$Programme,regex("Econometrics|EDS|EOR", ignore_case = TRUE)) 
+  str_view(regex("BA|Business", ignore_case = TRUE))
   
+Programme_cluster <- ODI$Programme %>% 
+  str_view(regex("AI|artificial", ignore_case = TRUE), "AI") %>% 
+  str_view(regex("CS|Computer|Computational", ignore_case = TRUE), "CS") %>%
+  str_view(regex("Bio", ignore_case = TRUE), "BIO") %>% 
+  str_view(regex("Finance|Duisenberg|QRM|Risk", ignore_case = TRUE), "FIN") %>% 
+  str_view(regex("Econometrics|EDS|EOR", ignore_case = TRUE), "ECO") %>% 
+  str_view(regex("BA|Business", ignore_case = TRUE), "BUS")
 
+Programme_cluster <- rep(0,313)
+for (i in (1:313)){
+  if (str_detect(ODI$Programme[i],regex("AI|artificial", ignore_case = TRUE))){
+    Programme_cluster[i] = "AI"
+  } else if (str_detect(ODI$Programme[i],regex("CS|Computer|Computational", ignore_case = TRUE))){
+    Programme_cluster[i] = "CS"
+  } else if (str_detect(ODI$Programme[i],regex("Bio", ignore_case = TRUE))){
+    Programme_cluster[i] = "BIO"
+  } else if (str_detect(ODI$Programme[i],regex("Finance|Duisenberg|QRM|Risk", ignore_case = TRUE))){
+    Programme_cluster[i] = "FIN"
+  } else if (str_detect(ODI$Programme[i],regex("Econometrics|EDS|EOR", ignore_case = TRUE))){
+    Programme_cluster[i] = "ECO"
+  } else if (str_detect(ODI$Programme[i],regex("BA|Business", ignore_case = TRUE))){
+    Programme_cluster[i] = "BUS"
+  }
+}
 Programme_cluster
+ODI$Programme
 
-
+str_count(Programme_cluster,"ECO")
 Programme_cluster =
     ifelse(str_detect(ODI$Programme,regex("AI|artificial", ignore_case = TRUE)), "AI",
     ifelse(str_detect(ODI$Programme,regex("CS|Computer|Computational", ignore_case = TRUE)), "CS",

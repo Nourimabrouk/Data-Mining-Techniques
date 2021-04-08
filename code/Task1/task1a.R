@@ -17,7 +17,7 @@ names = c("DateTime", "Programme", "MLCourse", "IRCourse", "StatCourse", "DBCour
           "Birthdate", "Neighbours", "Standup", "Stresslevel", "Reward", "RandomNo", "Bedtime", "Goodday1",
           "Goodday2")
 #raw = read_csv(here('data','ODI', 'ODI-2021.csv'), col_names = names) %>% as_tibble() %>% slice(-1)
-raw = read_csv("/Users/vyly/Desktop/VU_Master/DataMining/Data-Mining-Techniques/data/ODI/ODI-2021.csv", col_names = names) %>% as_tibble() %>% slice(-1)
+raw = read_csv("~/Studie/VU/MSc/Data_Mining_Techniques/Data-Mining-Techniques/data/ODI/ODI-2021.csv", col_names = names) %>% as_tibble() %>% slice(-1)
 ODI = raw %>% 
   separate(DateTime, sep = " ", into = c("Date", "Time")) %>% 
   mutate(MLCourse = as.integer(MLCourse == "yes"),
@@ -39,17 +39,12 @@ ODI[,'Neighbours'][ODI[,'Neighbours'] > 10] = NA # Replace higher than 10 (unrea
 ODI[,'Stresslevel'][ODI[,'Stresslevel'] < 0 | ODI[,'Stresslevel'] > 100] = NA # Remove outside range (0,100)
 
 Programme_cluster =
-    ifelse(grepl("AI|artificial", ODI$Programme, ignore.case=T), "AI",
-    ifelse(grepl("CS|Computer|Computational", ODI$Programme, ignore.case=T), "CS",
+    ifelse(grepl("\\bAI\\b|artificial", ODI$Programme, ignore.case=T), "AI",
+    ifelse(grepl("\\bCS\\b|Computer|Computational", ODI$Programme, ignore.case=T), "CS",
     ifelse(grepl("Bio", ODI$Programme, ignore.case=T), "BIO",
-<<<<<<< Updated upstream
     ifelse(grepl("Finance|Duisenberg|QRM", ODI$Programme, ignore.case=T), "FIN",
-    ifelse( grepl("Econometrics|EDS|EOR", ODI$Programme, ignore.case=T), "ECO",
-=======
-    ifelse(grepl("Finance|Duisenberg", ODI$Programme, ignore.case=T), "FIN",
-    ifelse(grepl("Econometrics|EDS", ODI$Programme, ignore.case=T), "ECO",
->>>>>>> Stashed changes
-    ifelse(grepl("BA|Business", ODI$Programme, ignore.case=T), "BIZ",
+    ifelse(grepl("Econometrics|EDS|EOR", ODI$Programme, ignore.case=T), "ECO",
+    ifelse(grepl("\\bBA\\b|Business", ODI$Programme, ignore.case=T), "BUS",
     "Other"))))))
 
 ODI <- ODI %>% 
@@ -59,7 +54,6 @@ ODI <- ODI %>%
     Time = hms(Time))
 #unique(ODI$Programme)
 
-<<<<<<< Updated upstream
 #####Plotting#####
 ##Stacked plot's data
 df = ODI[,3:7]
@@ -79,17 +73,15 @@ ggplot(data=d, aes(x=variable, y=count, fill=value)) +
   labs(title="Student Academic Background Info", x="Course", y="Count", fill="Participation") + 
   theme(plot.title = element_text(size=25, margin=margin(t=20, b=20)))
 
-sum(d$Programme =="ECO")
-TODO:
-=======
+sum(df$Programme =="AI")
+sum(df$Programme =="CS")
+sum(df$Programme =="BIO")
+sum(df$Programme =="FIN")
+sum(df$Programme =="ECO")
+sum(df$Programme =="BUS")
+sum(df$Programme =="Other")
+TODO
 
-ODI %>% View()
-
-barchart_input = ODI %>% select(3:7)
-barchart_input
->>>>>>> Stashed changes
-
-TODO:
 
 # Birthdate
   # Extract Years
