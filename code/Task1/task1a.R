@@ -12,7 +12,11 @@ library(lubridate)
 library(ggplot2)
 library(reshape2)
 library(plyr)
+library(anytime)
+library(chron)
 
+
+####Import dataset#####
 names = c("DateTime", "Programme", "MLCourse", "IRCourse", "StatCourse", "DBCourse", "Gender", "Chocolate",
           "Birthdate", "Neighbours", "Standup", "Stresslevel", "Reward", "RandomNo", "Bedtime", "Goodday1",
           "Goodday2")
@@ -47,6 +51,43 @@ Programme_cluster =
     ifelse(grepl("\\bCS\\b|\\bComputer\\b|\\bComputational\\b|\\binformation|\\bdata", ODI$Programme, ignore.case=T), "CS",
     "Other"))))))
 
+
+###### birthdates ######
+birthdates <- dmy(ODI$Birthdate, truncated = 2)
+birthdates <- as.numeric(format(birthdates, format="%Y"))
+birthdates[is.na(birthdates)|birthdates==0|birthdates>2005|birthdates<1950] <- median(na.exclude(birthdates))
+#####Bed time#####
+# ODI$fixbedtime = ifelse(grepl("pm|am|a.m.|p.m.", ODI$Bedtime, ignore.case=T), "ampm", ifelse(grepl("[b-z]|\\?", ODI$Bedtime, ignore.case=T),NA,"24"))
+# bed = data.frame(ODI$Bedtime,ODI$fixbedtime)
+# bed$hour = ifelse()
+# count(is.na(bed$ODI.fixbedtime))
+
+
+
+#with packages
+bed1 <- hm(ODI$Bedtime) 
+bed1 <- bed1@hour
+bed1 = str_extract(bed1, "^\\d{2}")
+
+count(is.na(bed1))
+
+
+
+
+a <- parse_date_time(ODI$Bedtime, c("HM", ))
+count(is.na(bed1))
+
+bed <- as_hms(bed1)
+bed <- strftime(bed, format="%H:%M")
+bed1 <- as.numeric(format(bed, format="%h:%m"))
+chron::times(sd(chron::times(bed1)))
+
+bed1 <- as.numeric(format(bed1, format="%h:%m"))
+bed = data.frame(ODI$Bedtime,bed1)
+count(is.na(bed$bed1))
+mean(na.ignore(bed$bed1))
+median(bed$bed1, na.rm = TRUE)
+#####Goodday######
 goodday1_cluster =
   ifelse(grepl("sun|weather|sun|wheather|rain|spring|summer",
                ODI$Goodday1, ignore.case=T), "Weather",
@@ -92,19 +133,20 @@ goodday2_cluster =
                                                   ODI$Goodday2, ignore.case=T), "Resting",
                                             "Other"))))))
 
-
+#####dataset mutate####
 ODI <- ODI %>% 
   mutate(
     Programme = Programme_cluster,
     Date = mdy(Date),
-    Time = hms(Time))
+    Time = hms(Time),
+    Birthdate = birthdates)
 ODI$gd1 = goodday1_cluster
 ODI$gd2 = goodday2_cluster
 
 final_goodday = ifelse(ODI$gd1 == "Other", ODI$gd2, ODI$gd1)
 
 ODI$finalgd = final_goodday
-#unique(ODI$Programme)
+
 
 #####Plotting#####
 ##Stacked plot's data
@@ -148,4 +190,6 @@ TODO
 # Bedtime
   # Assign groups
 # Gday1/2
+
+
 
