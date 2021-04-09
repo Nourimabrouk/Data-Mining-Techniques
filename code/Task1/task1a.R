@@ -97,7 +97,6 @@ goodday2_cluster =
          ODI$Goodday2, ignore.case=T), "Resting",
          "Other"))))))
 
-final_goodday = ifelse(ODI$gd1 == "Other", ODI$gd2, ODI$gd1)
 
 ODI <- ODI %>% 
   mutate(
@@ -106,6 +105,9 @@ ODI <- ODI %>%
     Time = hms(Time))
 ODI$gd1 = goodday1_cluster
 ODI$gd2 = goodday2_cluster
+
+final_goodday = ifelse(ODI$gd1 == "Other", ODI$gd2, ODI$gd1)
+
 ODI$finalgd = final_goodday
 #unique(ODI$Programme)
 
@@ -115,11 +117,11 @@ df = ODI[,3:7]
 colnames(df) <- c("Programme","ML", "IR","St","DB")
 
 #testing the match
-correctmajor = read_csv("./data/ODI/programme.csv")
-test = data.frame(correctmajor,df$Programme)
-
-test$test = test$Class == test$df.Programme
-count(test$test)
+# correctmajor = read_csv("./data/ODI/programme.csv")
+# test = data.frame(correctmajor,df$Programme)
+# 
+# test$test = test$Class == test$df.Programme
+# count(test$test)
 
 #Wide to long for plotting
 meltd <- melt(df, id.vars ="Programme",na.rm = T)
@@ -130,21 +132,15 @@ d$value = factor(d$value, levels = c("1","0","mu","sigma","ja","nee"), labels = 
 #create a column with value of 1 for the y axis
 d$count = rep(1)
 #plot
-t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) + 
-  geom_bar(stat="identity") + 
+t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) +
+  geom_bar(stat="identity") +
   facet_grid(~Programme) +
-  labs(title="Student Academic Background Info", x="Course", y="Count", fill= "participation") + 
-  theme(plot.title = element_text(size=25, margin=margin(t=20, b=20))) +
-  scale_fill_hue(direction = -1,labels = c("Yes", "No")) 
-ggsave(t1p1, file="Background_info.png")
+  labs(title="Student Academic Background Info", x="Course", y="Count", fill= "participation") +
+  theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7)) +
+  scale_fill_hue(direction = -1,labels = c("Yes", "No"))
 
-sum(df$Programme =="AI")
-sum(df$Programme =="CS")
-sum(df$Programme =="BIO")
-sum(df$Programme =="FIN")
-sum(df$Programme =="ECO")
-sum(df$Programme =="BUS")
-sum(df$Programme =="Other")
+t1p1
+ggsave(t1p1, file="plots/Background_info.eps")
 
 TODO
 
