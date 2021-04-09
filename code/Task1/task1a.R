@@ -67,26 +67,27 @@ birthdates[is.na(birthdates)|birthdates==0|birthdates>2005|birthdates<1950] <- m
 #with packages
 bed1 <- hm(ODI$Bedtime) 
 bed1 <- bed1@hour
-bed1 = str_extract(bed1, "^\\d{2}")
+bed1 = ifelse(nchar(as.character(bed1)) > 2,str_extract(bed1, "^.{2}"), bed1)
+ifelse(bed1 >24,0,bed1)
 
 count(is.na(bed1))
 
 
 
 
-a <- parse_date_time(ODI$Bedtime, c("HM", ))
-count(is.na(bed1))
-
-bed <- as_hms(bed1)
-bed <- strftime(bed, format="%H:%M")
-bed1 <- as.numeric(format(bed, format="%h:%m"))
-chron::times(sd(chron::times(bed1)))
-
-bed1 <- as.numeric(format(bed1, format="%h:%m"))
-bed = data.frame(ODI$Bedtime,bed1)
-count(is.na(bed$bed1))
-mean(na.ignore(bed$bed1))
-median(bed$bed1, na.rm = TRUE)
+# a <- parse_date_time(ODI$Bedtime, c("HM", ))
+# count(is.na(bed1))
+# 
+# bed <- as_hms(bed1)
+# bed <- strftime(bed, format="%H:%M")
+# bed1 <- as.numeric(format(bed, format="%h:%m"))
+# chron::times(sd(chron::times(bed1)))
+# 
+# bed1 <- as.numeric(format(bed1, format="%h:%m"))
+# bed = data.frame(ODI$Bedtime,bed1)
+# count(is.na(bed$bed1))
+# mean(na.ignore(bed$bed1))
+# median(bed$bed1, na.rm = TRUE)
 #####Goodday######
 goodday1_cluster =
   ifelse(grepl("sun|weather|sun|wheather|rain|spring|summer",
