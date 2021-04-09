@@ -48,54 +48,49 @@ Programme_cluster =
     "Other"))))))
 
 goodday1_cluster =
-  ifelse(grepl("sun| weather| sun|  wheather| rain| spring| summer",
+  ifelse(grepl("sun|weather|sun|wheather|rain|spring|summer",
                ODI$Goodday1, ignore.case=T), "Weather",
          
-  ifelse(grepl("coff|\\bfood\\b| cofee| coffe| drink | tea| wine| beer|
-               rice| pasta| meal| breakfast| lunch| dinner| brunch| stomach| cream"
+  ifelse(grepl("coff|\\bfood\\b|cofee|coffe|drink|\\btea\\b|wine|beer|
+               rice|pasta|meal|breakfast|lunch|dinner|brunch|stomach|cream"
                , ODI$Goodday1, ignore.case=T), "F&B",
                 
-  ifelse(grepl("do| done| doing| finish| deadline| task| study| work| course|
-               get| plan|  learn| efficien| control|
-               productive| motivat| zoom| project| grade| win"
+  ifelse(grepl("do|done|doing|finish|deadline|task|study|work|course|
+              get|plan|learn|efficien|control|productive|motivat|zoom|project|grade|win"
                , ODI$Goodday1, ignore.case=T), "Goals",    
                        
-  ifelse(grepl("family| social| friend| talk| hanging| meeting| going| act| company|
-               party| corona| talk| people"
+  ifelse(grepl("family|social|friend|talk|hanging|meeting|going|act|company|party|corona|talk|people"
                , ODI$Goodday1, ignore.case=T), "Social",
                               
-  ifelse(grepl("workout| exercise| jogging| running| out| sport"
+  ifelse(grepl("workout|exercise|jogging|running|out|sport|soccer|swim"
                , ODI$Goodday1, ignore.case=T), "Exercise",
                                      
-  ifelse(grepl(" relax| chill| sleep| free| music| no| walk| sex| 
-               mood |rest| tired| stress| not", 
+  ifelse(grepl("relax|chill|sleep|free|music|no|walk|sex|mood|rest|tired|stress|not", 
                ODI$Goodday1, ignore.case=T), "Resting",
   "Other"))))))
 
 goodday2_cluster =
-  ifelse(grepl("sun| weather| sun|  wheather| rain| spring| summer",
-              ODI$Goodday2, ignore.case=T), "Weather",
+  
+  ifelse(grepl("sun|weather|sun|wheather|rain|spring|summer",
+               ODI$Goodday2, ignore.case=T), "Weather",
          
-  ifelse(grepl("coff|\\bfood\\b| cofee| coffe| drink | tea| wine| beer|
-              rice| pasta| meal| breakfast| lunch| dinner| brunch| stomach| cream"
-              , ODI$Goodday2, ignore.case=T), "F&B",
+         ifelse(grepl("coff|\\bfood\\b|cofee|coffe|drink|\\btea\\b|wine|beer|
+               rice|pasta|meal|breakfast|lunch|dinner|brunch|stomach|cream"
+                      , ODI$Goodday2, ignore.case=T), "F&B",
                 
-  ifelse(grepl("do| done| doing| finish| deadline| task| study| work| course|
-              get| plan|  learn| efficien| control|
-              productive| motivat| zoom| project| grade| win"
-              , ODI$Goodday2, ignore.case=T), "Goals",    
+                ifelse(grepl("do|done|doing|finish|deadline|task|study|work|course|
+              get|plan|learn|efficien|control|productive|motivat|zoom|project|grade|win"
+                             , ODI$Goodday2, ignore.case=T), "Goals",    
                        
-  ifelse(grepl("family| social| friend| talk| hanging| meeting| going| act| company|
-               party| corona| talk| people"
-              , ODI$Goodday2, ignore.case=T), "Social",
+                       ifelse(grepl("family|social|friend|talk|hanging|meeting|going|act|company|party|corona|talk|people"
+                                    , ODI$Goodday2, ignore.case=T), "Social",
                               
-  ifelse(grepl("workout| exercise| jogging| running| out| sport"
-              , ODI$Goodday2, ignore.case=T), "Exercise",
+                              ifelse(grepl("workout|exercise|jogging|running|out|sport|soccer|swim"
+                                           , ODI$Goodday2, ignore.case=T), "Exercise",
                                      
-  ifelse(grepl(" relax| chill| sleep| free| music| no| walk| sex| 
-               mood |rest| tired| stress| not", 
-         ODI$Goodday2, ignore.case=T), "Resting",
-         "Other"))))))
+                                     ifelse(grepl("relax|chill|sleep|free|music|no|walk|sex|mood|rest|tired|stress|not", 
+                                                  ODI$Goodday2, ignore.case=T), "Resting",
+                                            "Other"))))))
 
 
 ODI <- ODI %>% 
