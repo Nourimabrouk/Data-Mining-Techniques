@@ -138,9 +138,7 @@ t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) +
   labs(title="Student Academic Background Info", x="Course", y="Count", fill= "participation") +
   theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7)) +
   scale_fill_hue(direction = -1,labels = c("Yes", "No"))
-
-t1p1
-ggsave(t1p1, file="plots/Background_info.eps")
+# ggsave(t1p1, file="plots/Background_info.eps")
 
 TODO
 
