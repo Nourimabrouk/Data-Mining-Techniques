@@ -13,6 +13,8 @@ library(ggplot2)
 library(reshape2)
 library(plyr)
 library(anytime)
+library(GGally)
+library(ggpubr)
 
 #### self-built functions ####
 getmode <- function(v) {
@@ -37,7 +39,7 @@ ODI = raw %>%
          Neighbours = na_if(as.integer(Neighbours), "NaN"), # Drop non numeric
          Stresslevel = as.integer(ifelse(str_detect(Stresslevel, regex('over', ignore_case = T)), NA, Stresslevel)), # Remove non numerical 
          Reward = ifelse(as.numeric(Reward)>100,100,as.numeric(Reward)), # non numeric entries become NA and specify that reward can't be more than the initial ???100
-         RandomNo = ifelse(as.numeric(RandomNo)>10^7,NA,as.numeric(RandomNo)) # non numeric entries become NA and remove outliers
+         RandomNo = ifelse(as.numeric(RandomNo)>10^4,NA,as.numeric(RandomNo)) # non numeric entries become NA and remove outliers
          ) %>% 
   select(-c('Standup')) # Drop standup
 
@@ -67,9 +69,11 @@ birthdates <- dmy(ODI$Birthdate, truncated = 2)
 birthdates <- as.numeric(format(birthdates, format="%Y"))
 birthdates[is.na(birthdates)|birthdates==0|birthdates>2005|birthdates<1950] <- median(birthdates, na.rm = T)
 
-#### Neighbours ####
-ODI$Neighbours[ODI$Neighbours==] <- 
-
+#### Clean missing values in numerical variables ####
+ODI$Neighbours[is.na(ODI$Neighbours)] <- getmode(na.exclude(ODI$Neighbours)) 
+ODI$Reward[is.na(ODI$Reward)] <- getmode(na.exclude(ODI$Reward))
+ODI$RandomNo[is.na(ODI$RandomNo)] <- getmode(na.exclude(ODI$RandomNo))
+ODI$Stresslevel[is.na(ODI$Stresslevel)] <- 50 # because stress level could be between 0-100
 
 #####Bed time#####
 bed1 <- hm(ODI$Bedtime) 
@@ -124,6 +128,8 @@ ODI <- ODI %>%
     Time = hms(Time),
     Bedtime = bed1,
     Birthdate = birthdates)
+
+ODI$Bedtime = factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T)
 ODI$gd1 = goodday1_cluster
 ODI$gd2 = goodday2_cluster
 
@@ -161,25 +167,65 @@ t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) +
   scale_fill_hue(direction = -1,labels = c("Yes", "No"))
 # ggsave(t1p1, file="plots/Background_info.eps")
 
-TODO
-ODI$Stresslevel[is.na(ODI$Stresslevel)] <- 50
-df2 <- data.frame(ODI$Bedtime,ODI$Stresslevel)
-count(is.na(df2))
-cor(cbind(factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T),ODI$Stresslevel))
 
-cor(ODI[10:14])
+# df2 <- data.frame(ODI$Bedtime,ODI$Stresslevel)
+# count(is.na(df2))
+# cor(cbind(factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T),ODI$Stresslevel))
+# 
+# (ODI[10:14])
+
+##plot for nominal data
+df2_choco = data.frame(raw$Gender, raw$Chocolate)
+colnames(df2_choco) <- c("Gender","Choco")
+df2_gd = data.frame(raw$Gender, ODI$finalgd)
+colnames(df2_gd) <- c("Gender","Goodday")
+df2_choco$Choco =
+  ifelse(grepl("idea",df2_choco$Choco, ignore.case=T),"No Idea",raw$Chocolate)
+
+meltdf2_choco <- melt(df2_choco, id.vars ="Gender",na.rm = T)
+d2_choco <- with(meltdf2_choco, meltdf2_choco[order(Gender, variable, value),])
+meltdf2_gd <- melt(df2_gd, id.vars ="Gender",na.rm = T)
+d2_gd <- with(meltdf2_gd, meltdf2_gd[order(Gender, variable, value),])
+
+#add a count col
+d2_choco$count = rep(1)
+d2_gd$count = rep(1)
+#plot
+t1p2_choco <- ggplot(data=d2_choco, aes(x=value, y=count, fill=Gender)) +
+  geom_bar(stat="identity") +
+  facet_grid(~variable)+
+  labs(x="Opinion", y="Count", fill= "Gender") +
+  theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7))
+t1p2_choco
+
+t1p2_gd <- ggplot(data=d2_gd, aes(x=value, y=count, fill=Gender)) +
+  geom_bar(stat="identity") +
+  facet_grid(~variable)+
+  labs(x="Opinion", y="Count", fill= "Gender") +
+  theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7))
+t1p2_gd
+
+t1p2 <- ggarrange(t1p2_choco,t1p2_gd,
+                  ncol = 1, nrow = 2)
+t1p2
 
 
-# Birthdate
-  # Extract Years
-# Reward
-# RandomNo
-  # Drop str_detect "E"
-  # Drop str_detect "character"
-  # Amount of Digits? OR Histogram?
-# Bedtime
-  # Assign groups
-# Gday1/2
+
+
+t1p3 <- ggpairs(ODI, columns = 10:15,
+         title = "Correlogram of numerical ODI variables",
+         columnLabels = c("birthyear","neighbours","stress","reward","random no.","bedtime"),
+         diag=list(continuous="barDiag"),
+         lower = list(continuous="cor")) +
+    theme_minimal() +
+       theme(
+         axis.line = element_blank(),
+         axis.text.y.left = element_blank(),
+         axis.text.x.bottom = element_text(size = 5),
+         axis.ticks.x.bottom = element_line()
+       )
+print(t1p3)      
+
 
 
 
