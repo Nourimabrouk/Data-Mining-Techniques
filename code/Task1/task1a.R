@@ -36,12 +36,12 @@ ODI = raw %>%
          Chocolate = as.numeric(as.factor(Chocolate)), # [1 :"fat" 2 :"I have no idea what you are talking about" 3:"neither" 4 :"slim" 5 :"unknown"]
          Neighbours = na_if(as.integer(Neighbours), "NaN"), # Drop non numeric
          Stresslevel = as.integer(ifelse(str_detect(Stresslevel, regex('over', ignore_case = T)), NA, Stresslevel)), # Remove non numerical 
-         Reward = ifelse(as.numeric(Reward)>100,NA,as.numeric(Reward)), # non numeric entries become NA and specify that reward can't be more than the initial ???100
-         RandomNo = as.numeric(RandomNo) # non numeric entries become NA and remove outliers
+         Reward = ifelse(as.numeric(Reward)>100,100,as.numeric(Reward)), # non numeric entries become NA and specify that reward can't be more than the initial ???100
+         RandomNo = ifelse(as.numeric(RandomNo)>10^7,NA,as.numeric(RandomNo)) # non numeric entries become NA and remove outliers
          ) %>% 
   select(-c('Standup')) # Drop standup
 
-hist(ODI$RandomNo)
+hist(ODI$Reward)
 boxplot(ODI$RandomNo)
 
 colnames(ODI)
@@ -67,6 +67,10 @@ birthdates <- dmy(ODI$Birthdate, truncated = 2)
 birthdates <- as.numeric(format(birthdates, format="%Y"))
 birthdates[is.na(birthdates)|birthdates==0|birthdates>2005|birthdates<1950] <- median(birthdates, na.rm = T)
 
+#### Neighbours ####
+ODI$Neighbours[ODI$Neighbours==] <- 
+
+
 #####Bed time#####
 bed1 <- hm(ODI$Bedtime) 
 bed1 <- bed1@hour
@@ -80,7 +84,6 @@ bed1[bed1==11] <- 23
 bed1[bed1==12|bed1==24] <- 0
 bed1[bed1>5 & bed1<19] <- NA
 bed1[is.na(bed1)] <- getmode(na.exclude(bed1))
-
 
 #####Goodday######
 goodday1_cluster =
@@ -159,6 +162,12 @@ t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) +
 # ggsave(t1p1, file="plots/Background_info.eps")
 
 TODO
+ODI$Stresslevel[is.na(ODI$Stresslevel)] <- 50
+df2 <- data.frame(ODI$Bedtime,ODI$Stresslevel)
+count(is.na(df2))
+cor(cbind(factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T),ODI$Stresslevel))
+
+cor(ODI[10:14])
 
 
 # Birthdate
