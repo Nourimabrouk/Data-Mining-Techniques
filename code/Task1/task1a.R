@@ -38,7 +38,7 @@ ODI = raw %>%
          Chocolate = as.numeric(as.factor(Chocolate)), # [1 :"fat" 2 :"I have no idea what you are talking about" 3:"neither" 4 :"slim" 5 :"unknown"]
          Neighbours = na_if(as.integer(Neighbours), "NaN"), # Drop non numeric
          Stresslevel = as.integer(ifelse(str_detect(Stresslevel, regex('over', ignore_case = T)), NA, Stresslevel)), # Remove non numerical 
-         Reward = ifelse(as.numeric(Reward)>100,100,as.numeric(Reward)), # non numeric entries become NA and specify that reward can't be more than the initial ???100
+         Reward = ifelse(as.numeric(Reward)>100,100,as.numeric(Reward)), # non numeric entries become NA and specify that reward can't be more than the initial €100
          RandomNo = ifelse(as.numeric(RandomNo)>10^4,NA,as.numeric(RandomNo)) # non numeric entries become NA and remove outliers
          ) %>% 
   select(-c('Standup')) # Drop standup
@@ -85,17 +85,17 @@ bed1[bed1==11] <- 23
 bed1[bed1==12|bed1==24] <- 0
 bed1[bed1>5 & bed1<19] <- NA
 bed1[is.na(bed1)] <- getmode(na.exclude(bed1))
-bed1[bed1==19] <- -11
-bed1[bed1==20] <- -10
-bed1[bed1==21] <- -9
-bed1[bed1==22] <- -8
-bed1[bed1==23] <- -7
-bed1[bed1==0] <- -6
-bed1[bed1==1] <- -5
-bed1[bed1==2] <- -4
-bed1[bed1==3] <- -3
-bed1[bed1==4] <- -2
-bed1[bed1==5] <- -1
+# bed1[bed1==19] <- -11
+# bed1[bed1==20] <- -10
+# bed1[bed1==21] <- -9
+# bed1[bed1==22] <- -8
+# bed1[bed1==23] <- -7
+# bed1[bed1==0] <- -6
+# bed1[bed1==1] <- -5
+# bed1[bed1==2] <- -4
+# bed1[bed1==3] <- -3
+# bed1[bed1==4] <- -2
+# bed1[bed1==5] <- -1
 
 #####Goodday######
 goodday1_cluster =
@@ -151,13 +151,6 @@ ODI$finalgd = final_goodday
 df = ODI[,3:7]
 colnames(df) <- c("Programme","ML", "IR","St","DB")
 
-#testing the match
-# correctmajor = read_csv("./data/ODI/programme.csv")
-# test = data.frame(correctmajor,df$Programme)
-# 
-# test$test = test$Class == test$df.Programme
-# count(test$test)
-
 #Wide to long for plotting
 meltd <- melt(df, id.vars ="Programme",na.rm = T)
 #Order the column's value for stacked plot
@@ -173,22 +166,17 @@ t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) +
   labs(title="Student Academic Background Info", x="Course", y="Count", fill= "participation") +
   theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7)) +
   scale_fill_hue(direction = -1,labels = c("Yes", "No"))
+t1p1
 # ggsave(t1p1, file="plots/Background_info.eps")
 
 
-# df2 <- data.frame(ODI$Bedtime,ODI$Stresslevel)
-# count(is.na(df2))
-# cor(cbind(factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T),ODI$Stresslevel))
-# 
-# (ODI[10:14])
-
 ##plot for nominal data
 df2_choco = data.frame(raw$Gender, raw$Chocolate)
-colnames(df2_choco) <- c("Gender","Choco")
+colnames(df2_choco) <- c("Gender","Chocolate")
 df2_gd = data.frame(raw$Gender, ODI$finalgd)
 colnames(df2_gd) <- c("Gender","Goodday")
-df2_choco$Choco =
-  ifelse(grepl("idea",df2_choco$Choco, ignore.case=T),"No Idea",raw$Chocolate)
+df2_choco$Chocolate =
+  ifelse(grepl("idea",df2_choco$Chocolate, ignore.case=T),"No Idea",raw$Chocolate)
 
 meltdf2_choco <- melt(df2_choco, id.vars ="Gender",na.rm = T)
 d2_choco <- with(meltdf2_choco, meltdf2_choco[order(Gender, variable, value),])
@@ -202,25 +190,24 @@ d2_gd$count = rep(1)
 t1p2_choco <- ggplot(data=d2_choco, aes(x=value, y=count, fill=Gender)) +
   geom_bar(stat="identity") +
   facet_grid(~variable)+
-  labs(x="Opinion", y="Count", fill= "Gender") +
+  labs(x="", y="Count", fill= "Gender") +
   theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7))
-t1p2_choco
 
 t1p2_gd <- ggplot(data=d2_gd, aes(x=value, y=count, fill=Gender)) +
   geom_bar(stat="identity") +
   facet_grid(~variable)+
-  labs(x="Opinion", y="Count", fill= "Gender") +
+  labs(x="", y="Count", fill= "Gender") +
   theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7))
-t1p2_gd
 
 t1p2 <- ggarrange(t1p2_choco,t1p2_gd,
                   ncol = 1, nrow = 2)
 t1p2
+# ggsave(t1p2, file="plots/Choco_Goodday.eps")
 
 
-t1p3 <- ggpairs(ODI, columns = 10:15,
+t1p3 <- ggpairs(ODI, columns = 10:14,
          title = "Correlogram of numerical ODI variables",
-         columnLabels = c("birthyear","neighbours","stress","reward","random no.","bedtime"),
+         columnLabels = c("birthyear","neighbours","stress","reward","random no."),
          diag=list(continuous="barDiag"),
          lower = list(continuous="cor")) +
     theme_minimal() +
@@ -231,6 +218,7 @@ t1p3 <- ggpairs(ODI, columns = 10:15,
          axis.ticks.x.bottom = element_line()
        )
 print(t1p3)      
+# ggsave(print(t1p3), file="plots/Corr_matrix.eps")
 
 
 
