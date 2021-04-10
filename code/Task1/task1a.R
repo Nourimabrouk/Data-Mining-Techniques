@@ -43,9 +43,6 @@ ODI = raw %>%
          ) %>% 
   select(-c('Standup')) # Drop standup
 
-hist(ODI$Reward)
-boxplot(ODI$RandomNo)
-
 colnames(ODI)
 dim(ODI)
 ODI %>% head()
@@ -88,6 +85,17 @@ bed1[bed1==11] <- 23
 bed1[bed1==12|bed1==24] <- 0
 bed1[bed1>5 & bed1<19] <- NA
 bed1[is.na(bed1)] <- getmode(na.exclude(bed1))
+bed1[bed1==19] <- -11
+bed1[bed1==20] <- -10
+bed1[bed1==21] <- -9
+bed1[bed1==22] <- -8
+bed1[bed1==23] <- -7
+bed1[bed1==0] <- -6
+bed1[bed1==1] <- -5
+bed1[bed1==2] <- -4
+bed1[bed1==3] <- -3
+bed1[bed1==4] <- -2
+bed1[bed1==5] <- -1
 
 #####Goodday######
 goodday1_cluster =
@@ -129,7 +137,7 @@ ODI <- ODI %>%
     Bedtime = bed1,
     Birthdate = birthdates)
 
-ODI$Bedtime = factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T)
+# ODI$Bedtime = factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = T)
 ODI$gd1 = goodday1_cluster
 ODI$gd2 = goodday2_cluster
 
@@ -208,8 +216,6 @@ t1p2_gd
 t1p2 <- ggarrange(t1p2_choco,t1p2_gd,
                   ncol = 1, nrow = 2)
 t1p2
-
-
 
 
 t1p3 <- ggpairs(ODI, columns = 10:15,
