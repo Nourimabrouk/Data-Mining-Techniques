@@ -39,7 +39,7 @@ ODI = raw %>%
          Neighbours = na_if(as.integer(Neighbours), "NaN"), # Drop non numeric
          Stresslevel = as.integer(ifelse(str_detect(Stresslevel, regex('over', ignore_case = T)), NA, Stresslevel)), # Remove non numerical 
          Reward = ifelse(as.numeric(Reward)>100,100,as.numeric(Reward)), # non numeric entries become NA and specify that reward can't be more than the initial €100
-         RandomNo = ifelse(as.numeric(RandomNo)>10^4,NA,as.numeric(RandomNo)) # non numeric entries become NA and remove outliers
+         RandomNo = ifelse(abs(as.numeric(RandomNo))>100,NA,as.numeric(RandomNo)) # non numeric entries become NA and remove outliers
          ) %>% 
   select(-c('Standup')) # Drop standup
 
@@ -163,7 +163,7 @@ d$count = rep(1)
 t1p1 <- ggplot(data=d, aes(x=variable, y=count, fill=value)) +
   geom_bar(stat="identity") +
   facet_grid(~Programme) +
-  labs(title="Student Academic Background Info", x="Course", y="Count", fill= "participation") +
+  labs(x="Course", y="Count", fill= "participation") +
   theme(plot.title = element_text(size=16, margin=margin(t=20, b=20)), axis.text.x = element_text(size = 7)) +
   scale_fill_hue(direction = -1,labels = c("Yes", "No"))
 t1p1
@@ -204,9 +204,8 @@ t1p2 <- ggarrange(t1p2_choco,t1p2_gd,
 t1p2
 # ggsave(t1p2, file="plots/Choco_Goodday.eps")
 
-
+# pdf("plots/Corr_Matrix.pdf")
 t1p3 <- ggpairs(ODI, columns = 10:14,
-         title = "Correlogram of numerical ODI variables",
          columnLabels = c("birthyear","neighbours","stress","reward","random no."),
          diag=list(continuous="barDiag"),
          lower = list(continuous="cor")) +
@@ -214,12 +213,13 @@ t1p3 <- ggpairs(ODI, columns = 10:14,
        theme(
          axis.line = element_blank(),
          axis.text.y.left = element_blank(),
-         axis.text.x.bottom = element_text(size = 5),
+         axis.text.x.bottom = element_text(size = 7),
          axis.ticks.x.bottom = element_line()
        )
-print(t1p3)      
-# ggsave(print(t1p3), file="plots/Corr_matrix.eps")
+print(t1p3)
+# dev.off()
 
+#### Extract clean dataset ####
 
 
 
