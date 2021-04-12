@@ -13,4 +13,6 @@ library(lubridate)
 library(ggplot2)
 library(caret)
 
-ODI = read.csv("./data/ODI/ODI-2021_clean.csv",header = T, sep =";") %>% as_tibble()
+df = read.csv("./data/economy_asia/economy_asia.csv",header = T, sep =",") %>% as_tibble()
+dGDP <- df %>% filter(Indicator.Code=="NGDP_R_PC_PP_PT")
+dCPI <- df %>% filter(Indicator.Code=="PCPI_PC_PP_PT")
