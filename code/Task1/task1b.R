@@ -26,13 +26,12 @@ ODI <- ODI %>% dplyr::mutate(
   Bedtime= factor(ODI$Bedtime, levels =c("19","20","21","22","23","0","1","2","3","4","5"),  ordered = F)
 )
 # create a list of 80% of the rows in the original dataset we can use for training
-validation_index <- createDataPartition(ODI$finalgd, p=0.80, list=FALSE)
+validation_index <- createDataPartition(ODI$Gender, p=0.80, list=FALSE)
 # select 20% of the data for validation
 validation <- ODI[-validation_index,]
 # use the remaining 80% of data to training and testing the models
 ODI <- ODI[validation_index,]
-# Run algorithms using 10-fold cross validation
-control <- trainControl(method="cv", number=10)
+
 # Define comparison metric
 metric <- "Accuracy"
 # Define train control for k fold cross validation
