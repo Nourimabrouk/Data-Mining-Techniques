@@ -1,5 +1,5 @@
 "
-Data preprocessing 
+Classification 
 Data Mining Techniques 
 Assignment 1 
 Task 1 B
