@@ -6,14 +6,16 @@ library(quanteda)
 
 
 sms <- read_delim("data/sms/SmsCollection.csv", 
-                  ";", escape_double = FALSE, trim_ws = TRUE)
+                  ";", escape_double = FALSE, trim_ws = TRUE) %>% as_tibble()
 table(sms$label)
 names(sms)
+sms %>% head()
+
 
 msg.corpus<-corpus(sms$text)
 #separating Train and test data
-sms.train<-sms[1:4458,]
-sms.test<-sms[4458:nrow(sms),]
+sms_train<-sms[1:4458,]
+sms_test<-sms[4458:nrow(sms),]
 
 msg.dfm <- dfm(msg.corpus, tolower = TRUE)  #generating document freq matrix
 msg.dfm <- dfm_trim(msg.dfm, min_count = 5, min_docfreq = 3)  

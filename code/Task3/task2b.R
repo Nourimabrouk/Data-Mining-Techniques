@@ -23,7 +23,6 @@ Model:
         # To improve: TRY WITH CARET PACKAGE
 " 
 
-
 remove(list = ls())
 options(warn=-1)
 set.seed(1337)
@@ -38,6 +37,7 @@ library('ggplot2') # visualization
 library('ggthemes') # visualization
 library('mice') # imputation
 library('randomForest') # classification algorithm
+library("e1071")
 
 # Functions ##### 
 cabinToDeck <- function(cabin){
@@ -45,10 +45,6 @@ cabinToDeck <- function(cabin){
   deck <- substring(deck,1,1) %>% as_factor()
   return(deck)
 }
-imputeDeck <- function(deck, fare, Pclass, famSize){
-  
-}
-imputeAge <- function(){}
 
 countNA <- function(x){sum(is.na(x))}
 
@@ -65,7 +61,7 @@ cleaned_data <- original_data %>%
   select(-c(Name, Ticket, Embarked)) %>% 
   mutate(PassengerId = as.factor(PassengerId),
          Sex = as_factor(Sex),
-         Survived = as.logical(Survived),
+         Survived = as.factor(Survived),
          FamSize = SibSp + Parch,
          Deck = cabinToDeck(Cabin)) %>% 
   select(-c(SibSp, Parch, Cabin))
@@ -85,18 +81,30 @@ imputed_data <- complete(temp_data, 1) %>%
   select(8,1:7) %>%
   select(-Fare) 
 
+
 (desc_table <- summary(imputed_data))
-(desc_plot <- ggpairs(imputed_data %>% select(-PassengerId)))
+(desc_plot <- ggpairs(imputed_data %>% select(-c(PassengerId))))
   
+# randomForest without crossvalidation
 train_set <- imputed_data[1:train_size,]
 test_set <- imputed_data[train_size:length(imputed_data),]
 
-rf_model <- randomForest(Survived ~ Pclass + Sex + Age + FamSize + Deck,
-                         data = train_set)
-prediction <- predict(rf_model, test_set)
-solution <- data.frame(PassengerID = test_set$PassengerId, Survived = prediction) %>% as_tibble()
+train_control <- trainControl(method="cv", number=10)
 
-solution
+model_rf <- train(Survived ~ Pclass + Sex + Age + FamSize + Deck,
+                  data = train_set,  method="rf", metric = "Accuracy",
+                  trControl=train_control,na.action = na.omit)
 
+model_svm <- train(Survived ~ Pclass + Sex + Age + FamSize + Deck,
+                   data = train_set,  method="svmRadial",metric = "Accuracy",
+                   trControl=train_control, na.action = na.omit)
+
+results <- resamples(list(rf = model_rf, svm = model_svm))
+                     
+summary(results)
+dotplot(results)
+
+predictions <- predict(model_svm, test_set)
+confusionMatrix(predictions, test_set$Survived)
 
 
