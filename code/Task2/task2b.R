@@ -51,7 +51,7 @@ countNA <- function(x){sum(is.na(x))}
 # Rest ##### 
 
 train_set <- read_csv('./data/titanic/train.csv')
-test_set  <- read_csv('./data/titanic/train.csv')
+test_set  <- read_csv('./data/titanic/test.csv')
 
 train_size <- nrow(train_set) %>% as.numeric()
 
@@ -81,13 +81,12 @@ imputed_data <- complete(temp_data, 1) %>%
   select(8,1:7) %>%
   select(-Fare) 
 
-
 (desc_table <- summary(imputed_data))
 (desc_plot <- ggpairs(imputed_data %>% select(-c(PassengerId))))
   
 # Two classifiers with cross validation
 train_set <- imputed_data[1:train_size,]
-test_set <- imputed_data[train_size:length(imputed_data),]
+test_set <- imputed_data[train_size:nrow(imputed_data),]
 
 train_control <- trainControl(method="cv", number=10)
 
@@ -104,7 +103,7 @@ results <- resamples(list(rf = model_rf, svm = model_svm))
 summary(results)
 dotplot(results)
 
-predictions <- predict(model_svm, test_set)
+predictions <- predict(model_rf, test_set)
 confusionMatrix(predictions, test_set$Survived)
 
 
