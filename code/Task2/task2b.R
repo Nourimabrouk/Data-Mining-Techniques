@@ -66,7 +66,7 @@ cleaned_data <- original_data %>%
          Deck = cabinToDeck(Cabin)) %>% 
   select(-c(SibSp, Parch, Cabin))
 
-descriptives <- summary(cleaned_data)
+descriptives <- summary(cleaned_data[1:train_size,])
 descriptives
 
 missingvalues <- map(cleaned_data, countNA) %>% as_tibble()

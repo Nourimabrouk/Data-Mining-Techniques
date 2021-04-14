@@ -1,6 +1,6 @@
 library(tidyverse)
 library(quanteda)
-
+library(quanteda.textmodels)
 # Dont use naieve bayes
 # Follow quanteda tutorial
 
@@ -24,10 +24,12 @@ msg.dfm <- dfm_weight(msg.dfm)
 #trining and testing data of dfm 
 msg.dfm.train<-msg.dfm[1:4458,]
 
-msg.dfm.test<-msg.dfm[4458:nrow(sms),]
-nb.classifier<-textmodel_nb(msg.dfm.train,sms.train[,1])
+msg.dfm.test<-msg.dfm[(4458+1):nrow(sms),]
+nb.classifier<-textmodel_nb(msg.dfm.train,sms_train$label)
 nb.classifier
 pred<-predict(nb.classifier,msg.dfm.test)
-table(predicted=pred$nb.predicted,actual=sms.test[,1])
-mean(pred$nb.predicted==sms.test[,1])*100
+table(predicted=pred,actual=sms_test$label)
+mean(pred==sms_test$label)*100
+
+confusionMatrix(pred,sms_test$label)
 
