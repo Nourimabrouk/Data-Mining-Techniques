@@ -85,7 +85,7 @@ imputed_data <- complete(temp_data, 1) %>%
 (desc_table <- summary(imputed_data))
 (desc_plot <- ggpairs(imputed_data %>% select(-c(PassengerId))))
   
-# randomForest without crossvalidation
+# Two classifiers with cross validation
 train_set <- imputed_data[1:train_size,]
 test_set <- imputed_data[train_size:length(imputed_data),]
 
