@@ -72,21 +72,24 @@ descriptives
 missingvalues <- map(cleaned_data, countNA) %>% as_tibble()
 missingvalues
 
-temp_data <- mice(cleaned_data %>% select(-PassengerId),
+temp_data <- mice(cleaned_data %>% select(-PassengerId,-Survived),
              m = 1, meth = 'pmm', maxit = 50, print=FALSE, seed = 1337)
 
 imputed_data <- complete(temp_data, 1) %>% 
   as_tibble() %>% 
-  mutate(PassengerId = cleaned_data$PassengerId) %>% 
+  mutate(PassengerId = cleaned_data$PassengerId, Survived = cleaned_data$Survived) %>% 
   select(8,1:7) %>%
   select(-Fare) 
 
+missingvalues <- map(imputed_data, countNA) %>% as_tibble()
+missingvalues
+
 (desc_table <- summary(imputed_data))
-(desc_plot <- ggpairs(imputed_data %>% select(-c(PassengerId))))
+# (desc_plot <- ggpairs(imputed_data %>% select(-c(PassengerId))))
   
 # Two classifiers with cross validation
 train_set <- imputed_data[1:train_size,]
-test_set <- imputed_data[train_size:nrow(imputed_data),]
+test_set <- imputed_data[(train_size+1):nrow(imputed_data),]
 
 train_control <- trainControl(method="cv", number=10)
 
@@ -104,6 +107,10 @@ summary(results)
 dotplot(results)
 
 predictions <- predict(model_rf, test_set)
-confusionMatrix(predictions, test_set$Survived)
 
+# Save the solution to a dataframe with two columns: PassengerId and Survived (prediction)
+solution <- data.frame(PassengerID = test_set$PassengerId, Survived = predictions)
+
+# Write the solution to file
+write.csv(solution, file = './data/titanic/rf_mod_Solution.csv', row.names = F)
 

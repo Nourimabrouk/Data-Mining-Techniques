@@ -4,6 +4,7 @@ library(quanteda)
 # Dont use naieve bayes
 # Follow quanteda tutorial
 
+remove(list = ls())
 
 sms <- read_delim("data/sms/SmsCollection.csv", 
                   ";", escape_double = FALSE, trim_ws = TRUE) %>% as_tibble()
@@ -15,7 +16,7 @@ sms %>% head()
 msg.corpus<-corpus(sms$text)
 #separating Train and test data
 sms_train<-sms[1:4458,]
-sms_test<-sms[4458:nrow(sms),]
+sms_test<-sms[(4458+1):nrow(sms),]
 
 msg.dfm <- dfm(msg.corpus, tolower = TRUE)  #generating document freq matrix
 msg.dfm <- dfm_trim(msg.dfm, min_count = 5, min_docfreq = 3)  
