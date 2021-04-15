@@ -1,6 +1,12 @@
 library(tidyverse)
 library(quanteda)
 library(quanteda.textmodels)
+library(caret)
+library(glmnet)
+library(tm)
+library(SnowballC)
+library(Matrix)
+library(ROCR)
 # Dont use naieve bayes
 # Follow quanteda tutorial
 
@@ -12,24 +18,65 @@ table(sms$label)
 names(sms)
 sms %>% head()
 
+####REGULARIZED REGRESSION CLASSIFIER####
+str(sms)
+# convert spam/ham to factor.
+sms$label <- factor(sms$label)
 
-msg.corpus<-corpus(sms$text)
-#separating Train and test data
-sms_train<-sms[1:4458,]
-sms_test<-sms[(4458+1):nrow(sms),]
+# tokenize texts
+# create DTM using TM package
 
-msg.dfm <- dfm(msg.corpus, tolower = TRUE)  #generating document freq matrix
-msg.dfm <- dfm_trim(msg.dfm, min_count = 5, min_docfreq = 3)  
-msg.dfm <- dfm_weight(msg.dfm) 
-#trining and testing data of dfm 
-msg.dfm.train<-msg.dfm[1:4458,]
+sms_dtm <- Corpus(VectorSource(sms$text)) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(stemDocument) %>%
+  DocumentTermMatrix()
 
-msg.dfm.test<-msg.dfm[(4458+1):nrow(sms),]
-nb.classifier<-textmodel_nb(msg.dfm.train,sms_train$label)
-nb.classifier
-pred<-predict(nb.classifier,msg.dfm.test)
-table(predicted=pred,actual=sms_test$label)
-mean(pred==sms_test$label)*100
+#creating train and test data
+index = sample(5534, 5534*0.8)
 
-confusionMatrix(pred,sms_test$label)
+sms_train_matrix <- as.matrix(sms_dtm[index, ])
+sms_test_matrix <- as.matrix(sms_dtm[-index, ])
+
+sms_dtm_train <- Matrix(sms_train_matrix, sparse = T)
+sms_dtm_test  <- Matrix(sms_test_matrix, sparse = T)
+
+# save the labels
+sms_train_labels <- sms[index, ]$label
+sms_test_labels  <- sms[-index, ]$label
+
+# check for the proportion of train and test
+prop.table(table(sms_train_labels))
+prop.table(table(sms_test_labels))
+#train model
+lasso <- cv.glmnet(x = sms_dtm_train,
+                   y = as.integer(sms_train_labels == "ham"),
+                   alpha = 1,
+                   nfold = 5,
+                   family = "binomial")
+#As an initial evaluation of the model, we print the most predictive features. 
+#We begin by obtaining the best value of lambda:
+index_best <- which(lasso$lambda == lasso$lambda.min)
+beta <- lasso$glmnet.fit$beta[, index_best]
+head(sort(beta, decreasing = TRUE), 20)
+
+pred <- predict(lasso, sms_dtm_test, type = "response", s = lasso$lambda.min)
+head(pred)
+
+
+#Let’s inspect how well the classification worked.
+
+actual_class <- as.integer(sms_test_labels == "ham")
+predicted_class <- as.integer(predict(lasso, sms_dtm_test, type = "class"))
+tab_class <- table(actual_class, predicted_class)
+tab_class
+
+#We can use the function confusionMatrix() from the caret package to quantify the performance of the classification.
+
+confusionMatrix(tab_class, mode = "everything")
+
+
 
