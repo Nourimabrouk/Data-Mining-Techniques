@@ -220,6 +220,6 @@ print(t1p3)
 # dev.off()
 
 #### Extract clean dataset ####
-write.csv2(ODI,file="data/ODI/ODI-2021_clean.csv",row.names = F)
+# write.csv2(ODI,file="data/ODI/ODI-2021_clean.csv",row.names = F)
 
 
